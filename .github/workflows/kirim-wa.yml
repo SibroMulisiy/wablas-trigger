@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Kirim pesan ke Wablas
         env:
-          WABLAS_TOKEN: ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}
+          WABLAS_TOKEN: ${{ secrets.A1IXIJLDr9fKsygknLcnEUBYivifqMAMkJOVYt5Ogkpi0NypeMlNW8A }}
         run: |
           echo "Mengirim ke: ${{ github.event.inputs.phone }}"
           echo "Pesan: ${{ github.event.inputs.message }}"
