@@ -1,4 +1,4 @@
-name: Send WhatsApp via Wablas
+name: Kirim WhatsApp via Wablas
 
 on:
   workflow_dispatch:
@@ -18,12 +18,14 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Kirim WhatsApp via Wablas
+      - name: Kirim pesan WhatsApp
         run: |
+          echo "Mengirim ke: ${{ github.event.inputs.phone }}"
+          echo "Pesan: ${{ github.event.inputs.message }}"
           curl --request POST 'https://tegal.wablas.com/api/v2/send-message' \
---header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode "phone=6281234567890" \
---data-urlencode "message=Tes dari terminal" \
---data-urlencode "token=ISI_TOKEN_KAMU" \
---data-urlencode "secret=ISI_SECRET_KAMU" \
---verbose
+          --header 'Content-Type: application/x-www-form-urlencoded' \
+          --data-urlencode "phone=${{ github.event.inputs.phone }}" \
+          --data-urlencode "message=${{ github.event.inputs.message }}" \
+          --data-urlencode "token=$WABLAS_TOKEN" \
+          --data-urlencode "secret=$WABLAS_SECRET" \
+          --silent --show-error --fail
