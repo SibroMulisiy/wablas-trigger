@@ -13,22 +13,41 @@ on:
 jobs:
   kirim-wa:
     runs-on: ubuntu-latest
+    env:
+      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN }}  # Pastikan token disimpan di GitHub Secrets dengan nama ini
+
     steps:
-      - name: Kirim pesan ke Wablas
-        env:
-          WABLAS_TOKEN: ${{ secrets.A1IXIJLDr9fKsygknLcnEUBYivifqMAMkJOVYt5Ogkpi0NypeMlNW8A }}
+      - name: Validasi input
         run: |
-          echo "Mengirim ke: ${{ github.event.inputs.phone }}"
-          echo "Pesan: ${{ github.event.inputs.message }}"
-          
+          echo "📱 Nomor tujuan: ${{ github.event.inputs.phone }}"
+          echo "💬 Isi pesan: ${{ github.event.inputs.message }}"
+
+      - name: Bangun payload JSON
+        id: build_payload
+        run: |
           PAYLOAD=$(jq -n \
             --arg phone "${{ github.event.inputs.phone }}" \
             --arg message "${{ github.event.inputs.message }}" \
             '{data: [{phone: $phone, message: $message}]}')
+          echo "::set-output name=payload::$PAYLOAD"
 
-          RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
+      - name: Kirim ke Wablas API
+        run: |
+          echo "🚀 Mengirim request ke Wablas..."
+          RESPONSE=$(curl -s -X POST https://tegal.wablas.com/api/v2/send-message \
             -H "Authorization: Bearer $WABLAS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "$PAYLOAD")
+            -d '${{ steps.build_payload.outputs.payload }}')
 
-          echo "Response dari Wablas: $RESPONSE"
+          echo "📨 Response dari Wablas:"
+          echo "$RESPONSE"
+
+          STATUS=$(echo "$RESPONSE" | jq -r '.status')
+          MESSAGE=$(echo "$RESPONSE" | jq -r '.message')
+
+          if [ "$STATUS" != "true" ]; then
+            echo "❌ Gagal kirim: $MESSAGE"
+            exit 1
+          else
+            echo "✅ Pesan berhasil dikirim!"
+          fi
