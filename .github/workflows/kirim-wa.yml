@@ -1,42 +1,29 @@
-name: kirim-wa-v1
+name: Send WhatsApp via Wablas
 
 on:
   workflow_dispatch:
     inputs:
       phone:
-        description: 'Nomor WhatsApp tujuan (format 628...)'
+        description: 'Nomor tujuan (628xxx)'
         required: true
-        type: string
       message:
-        description: 'Isi pesan WhatsApp'
+        description: 'Isi pesan'
         required: true
-        type: string
+
+env:
+  WABLAS_TOKEN: ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}
+  WABLAS_SECRET: ${{ secrets.V9ZDhmRP }}
 
 jobs:
-  send-wa:
+  send:
     runs-on: ubuntu-latest
-    env:
-      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN }}
-      WABLAS_SECRET: ${{ secrets.WABLAS_SECRET }}
     steps:
-      - name: Kirim pesan ke Wablas (versi token+secret)
+      - name: Kirim WhatsApp via Wablas
         run: |
-          echo "📨 Mengirim ke: ${{ github.event.inputs.phone }}"
-          echo "📝 Isi pesan: ${{ github.event.inputs.message }}"
-
-          RESPONSE=$(curl -G "https://tegal.wablas.com/api/send-message" \
-            --data-urlencode "token=$jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s" \
-            --data-urlencode "secret=$V9ZDhmRP" \
-            --data-urlencode "phone=${{ github.event.inputs.phone }}" \
-            --data-urlencode "message=${{ github.event.inputs.message }}")
-
-          echo "📬 Response dari Wablas:"
-          echo "$RESPONSE"
-
-          STATUS=$(echo "$RESPONSE" | jq -r '.status')
-          if [ "$STATUS" != "true" ]; then
-            echo "❌ Gagal mengirim pesan. Cek token, secret, atau device."
-            exit 1
-          else
-            echo "✅ Pesan berhasil dikirim!"
-          fi
+          curl --request POST 'https://tegal.wablas.com/api/v2/send-message' \
+          --header 'Content-Type: application/x-www-form-urlencoded' \
+          --data-urlencode "phone=${{ github.event.inputs.phone }}" \
+          --data-urlencode "message=${{ github.event.inputs.message }}" \
+          --data-urlencode "token=$WABLAS_TOKEN" \
+          --data-urlencode "secret=$WABLAS_SECRET" \
+          --silent --show-error --fail
