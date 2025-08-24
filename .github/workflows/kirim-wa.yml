@@ -1,0 +1,25 @@
+name: Kirim WhatsApp via Wablas
+
+on:
+  workflow_dispatch:
+    inputs:
+      phone:
+        description: '+62 819-4490-2279'
+        required: true
+      message:
+        description: 'Isi pesan WhatsApp'
+        required: true
+
+jobs:
+  kirim-wa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kirim pesan ke Wablas
+        run: |
+          curl -X POST https://console.wablas.com/api/v2/send-message \
+          -H "Authorization: Bearer ${{ secrets.WABLAS_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "phone": "${{ github.event.inputs.phone }}",
+                "message": "${{ github.event.inputs.message }}"
+              }'
