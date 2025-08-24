@@ -4,28 +4,20 @@ on:
   workflow_dispatch:
     inputs:
       phone:
-        description: 'Nomor tujuan (628xxx)'
+        description: 'Nomor tujuan (format: 628xxxxxxxxxx)'
         required: true
       message:
-        description: 'Isi pesan'
+        description: 'Isi pesan WhatsApp'
         required: true
 
-env:
-  WABLAS_TOKEN: ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}
-  WABLAS_SECRET: ${{ secrets.V9ZDhmRP }}
-
 jobs:
-  send:
+  kirim-wa:
     runs-on: ubuntu-latest
     steps:
-      - name: Kirim pesan WhatsApp
+      - name: Kirim pesan ke Wablas
         run: |
-          echo "Mengirim ke: ${{ github.event.inputs.phone }}"
-          echo "Pesan: ${{ github.event.inputs.message }}"
-          curl --request POST 'https://tegal.wablas.com/api/v2/send-message' \
-          --header 'Content-Type: application/x-www-form-urlencoded' \
-          --data-urlencode "phone=${{ github.event.inputs.phone }}" \
-          --data-urlencode "message=${{ github.event.inputs.message }}" \
-          --data-urlencode "token=$WABLAS_TOKEN" \
-          --data-urlencode "secret=$WABLAS_SECRET" \
-          --silent --show-error --fail
+          RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
+            -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}")
+          echo "Response dari Wablas: $RESPONSE"
