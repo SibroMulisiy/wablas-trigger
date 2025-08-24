@@ -14,12 +14,13 @@ jobs:
   kirim-wa:
     runs-on: ubuntu-latest
     steps:
-      - name: Kirim pesan ke Wablas
-        run: |
-          curl -X POST https://tegal.wablas.com/api/v2/send-message \
-          -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-                "phone": "${{ github.event.inputs.phone }}",
-                "message": "${{ github.event.inputs.message }}"
-              }'
+     - name: Kirim pesan ke Wablas
+  run: |
+    RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
+      -H "Authorization: Bearer ${{ secrets.WABLAS_TOKEN }}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "phone": ["${{ github.event.inputs.phone }}"],
+        "message": "${{ github.event.inputs.message }}"
+      }')
+    echo "Response dari Wablas: $RESPONSE"
