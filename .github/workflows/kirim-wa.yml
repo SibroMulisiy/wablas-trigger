@@ -1,4 +1,4 @@
-name: Kirim WhatsApp via Wablas (Token2)
+name: Kirim WhatsApp via Wablas (Fix Payload)
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
   kirim-wa:
     runs-on: ubuntu-latest
     env:
-      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN2 }}  # Gunakan secret baru
+      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN2 }}
 
     steps:
       - name: Validasi input
@@ -22,22 +22,18 @@ jobs:
           echo "📱 Nomor tujuan: ${{ github.event.inputs.phone }}"
           echo "💬 Isi pesan: ${{ github.event.inputs.message }}"
 
-      - name: Bangun payload JSON
-        id: build_payload
-        run: |
-          PAYLOAD=$(jq -n \
-            --arg phone "${{ github.event.inputs.phone }}" \
-            --arg message "${{ github.event.inputs.message }}" \
-            '{data: [{phone: $phone, message: $message}]}')
-          echo "::set-output name=payload::$PAYLOAD"
-
       - name: Kirim ke Wablas API
         run: |
           echo "🚀 Mengirim request ke Wablas..."
+
+          PAYLOAD=$(echo "{\"data\":[{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}]}")
+          
+          echo "📦 Payload: $PAYLOAD"
+
           RESPONSE=$(curl -s -X POST https://tegal.wablas.com/api/v2/send-message \
             -H "Authorization: Bearer $WABLAS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '${{ steps.build_payload.outputs.payload }}')
+            -d "$PAYLOAD")
 
           echo "📨 Response dari Wablas:"
           echo "$RESPONSE"
