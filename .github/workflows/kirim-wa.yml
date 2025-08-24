@@ -1,26 +1,45 @@
-name: Kirim WhatsApp via Wablas
+name: kirim-wa
 
 on:
   workflow_dispatch:
     inputs:
       phone:
-        description: 'Nomor tujuan (format: 628xxxxxxxxxx)'
+        description: 'Nomor WhatsApp tujuan (format 628...)'
         required: true
+        type: string
       message:
         description: 'Isi pesan WhatsApp'
         required: true
+        type: string
 
 jobs:
-  kirim-wa:
+  send-wa:
     runs-on: ubuntu-latest
     steps:
       - name: Kirim pesan ke Wablas
         run: |
+          echo "📨 Mengirim pesan ke: ${{ github.event.inputs.phone }}"
+          echo "📝 Isi pesan: ${{ github.event.inputs.message }}"
+
           RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
             -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
             -H "Content-Type: application/json" \
             -d '{
-              "phone": ["${{ github.event.inputs.phone }}"],
-              "message": "${{ github.event.inputs.message }}"
+              "data": [
+                {
+                  "phone": "${{ github.event.inputs.phone }}",
+                  "message": "${{ github.event.inputs.message }}"
+                }
+              ]
             }')
-          echo "Response dari Wablas: $RESPONSE"
+
+          echo "📬 Response dari Wablas:"
+          echo "$RESPONSE"
+
+          STATUS=$(echo "$RESPONSE" | jq -r '.status')
+          if [ "$STATUS" != "true" ]; then
+            echo "❌ Gagal mengirim pesan. Cek struktur payload atau token."
+            exit 1
+          else
+            echo "✅ Pesan berhasil dikirim!"
+          fi
