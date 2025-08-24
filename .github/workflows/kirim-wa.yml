@@ -1,4 +1,4 @@
-name: kirim-wa
+name: kirim-wa-v1
 
 on:
   workflow_dispatch:
@@ -16,29 +16,23 @@ jobs:
   send-wa:
     runs-on: ubuntu-latest
     steps:
-      - name: Kirim pesan ke Wablas
+      - name: Kirim pesan ke Wablas (versi token+secret)
         run: |
-          echo "📨 Mengirim pesan ke: ${{ github.event.inputs.phone }}"
+          echo "📨 Mengirim ke: ${{ github.event.inputs.phone }}"
           echo "📝 Isi pesan: ${{ github.event.inputs.message }}"
 
-          RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
-            -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": [
-                {
-                  "phone": "${{ github.event.inputs.phone }}",
-                  "message": "${{ github.event.inputs.message }}"
-                }
-              ]
-            }')
+          RESPONSE=$(curl -G "https://tegal.wablas.com/api/send-message" \
+            --data-urlencode "token=${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
+            --data-urlencode "secret=${{ secrets.V9ZDhmRP }}" \
+            --data-urlencode "phone=${{ github.event.inputs.phone }}" \
+            --data-urlencode "message=${{ github.event.inputs.message }}")
 
           echo "📬 Response dari Wablas:"
           echo "$RESPONSE"
 
           STATUS=$(echo "$RESPONSE" | jq -r '.status')
           if [ "$STATUS" != "true" ]; then
-            echo "❌ Gagal mengirim pesan. Cek struktur payload atau token."
+            echo "❌ Gagal mengirim pesan. Cek token, secret, atau device."
             exit 1
           else
             echo "✅ Pesan berhasil dikirim!"
