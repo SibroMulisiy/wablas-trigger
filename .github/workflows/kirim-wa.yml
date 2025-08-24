@@ -14,7 +14,7 @@ jobs:
   kirim-wa:
     runs-on: ubuntu-latest
     env:
-      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN }}  # Pastikan token disimpan di GitHub Secrets dengan nama ini
+      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN2 }}  # Pastikan token disimpan di GitHub Secrets dengan nama ini
 
     steps:
       - name: Validasi input
@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "🚀 Mengirim request ke Wablas..."
           RESPONSE=$(curl -s -X POST https://tegal.wablas.com/api/v2/send-message \
-            -H "Authorization: Bearer $WABLAS_TOKEN" \
+            -H "Authorization: Bearer $WABLAS_TOKEN2" \
             -H "Content-Type: application/json" \
             -d '${{ steps.build_payload.outputs.payload }}')
 
