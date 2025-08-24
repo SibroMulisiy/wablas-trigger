@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       phone:
-        description: 'Nomor tujuan (format: 628xxxxxxxxxx)'
+        description: '+62 819-4490-2279'
         required: true
       message:
         description: 'Isi pesan WhatsApp'
@@ -16,8 +16,10 @@ jobs:
     steps:
       - name: Kirim pesan ke Wablas
         run: |
-          RESPONSE=$(curl -X POST https://api.wablas.com/api/v2/send-message \
-            -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}")
-          echo "Response dari Wablas: $RESPONSE"
+          curl -X POST https://tegal.wablas.com/api/v2/send-message \
+          -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "phone": "${{ github.event.inputs.phone }}",
+                "message": "${{ github.event.inputs.message }}"
+              }'
