@@ -15,9 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Kirim pesan ke Wablas
+        env:
+          WABLAS_TOKEN: ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}
         run: |
+          echo "Mengirim ke: ${{ github.event.inputs.phone }}"
+          echo "Pesan: ${{ github.event.inputs.message }}"
+          
+          PAYLOAD=$(jq -n \
+            --arg phone "${{ github.event.inputs.phone }}" \
+            --arg message "${{ github.event.inputs.message }}" \
+            '{data: [{phone: $phone, message: $message}]}')
+
           RESPONSE=$(curl -X POST https://tegal.wablas.com/api/v2/send-message \
-            -H "Authorization: Bearer ${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
+            -H "Authorization: Bearer $WABLAS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}")
+            -d "$PAYLOAD")
+
           echo "Response dari Wablas: $RESPONSE"
