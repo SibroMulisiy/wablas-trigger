@@ -15,6 +15,9 @@ on:
 jobs:
   send-wa:
     runs-on: ubuntu-latest
+    env:
+      WABLAS_TOKEN: ${{ secrets.WABLAS_TOKEN }}
+      WABLAS_SECRET: ${{ secrets.WABLAS_SECRET }}
     steps:
       - name: Kirim pesan ke Wablas (versi token+secret)
         run: |
@@ -22,8 +25,8 @@ jobs:
           echo "📝 Isi pesan: ${{ github.event.inputs.message }}"
 
           RESPONSE=$(curl -G "https://tegal.wablas.com/api/send-message" \
-            --data-urlencode "token=${{ secrets.jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s }}" \
-            --data-urlencode "secret=${{ secrets.V9ZDhmRP }}" \
+            --data-urlencode "token=$jaFCEOPupjtkuyp4Ue5wLxfauy3P09OhRzhmIG3JnLFOMN3L9yWDG4s" \
+            --data-urlencode "secret=$V9ZDhmRP" \
             --data-urlencode "phone=${{ github.event.inputs.phone }}" \
             --data-urlencode "message=${{ github.event.inputs.message }}")
 
