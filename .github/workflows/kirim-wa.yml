@@ -22,18 +22,21 @@ jobs:
           echo "📱 Nomor tujuan: ${{ github.event.inputs.phone }}"
           echo "💬 Isi pesan: ${{ github.event.inputs.message }}"
 
+      - name: Siapkan Payload
+        run: |
+          echo "🔧 Menyiapkan payload..."
+          PAYLOAD=$(echo "{\"data\":[{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}]}")
+          echo "📦 Payload: $PAYLOAD"
+          echo "$PAYLOAD" > payload.json
+
       - name: Kirim ke Wablas API
         run: |
           echo "🚀 Mengirim request ke Wablas..."
 
-          PAYLOAD=$(echo "{\"data\":[{\"phone\":\"${{ github.event.inputs.phone }}\",\"message\":\"${{ github.event.inputs.message }}\"}]}")
-          
-          echo "📦 Payload: $PAYLOAD"
-
           RESPONSE=$(curl -s -X POST https://tegal.wablas.com/api/v2/send-message \
             -H "Authorization: Bearer $WABLAS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "$PAYLOAD")
+            -d @payload.json)
 
           echo "📨 Response dari Wablas:"
           echo "$RESPONSE"
@@ -47,3 +50,7 @@ jobs:
           else
             echo "✅ Pesan berhasil dikirim!"
           fi
+
+      - name: Log response ke file (opsional)
+        run: |
+          echo "$RESPONSE" > wablas_response.json
